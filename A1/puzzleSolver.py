@@ -57,7 +57,7 @@ class puzzleSolver(object):
                 sum_mhd += row_distance + col_distance
         return [sum_mhd, matrix]
 
-    def eight_puzzle_solver(self, method=0):
+    def solver(self, method=0):
         explored_states = []
 
         start = self.input_matrix
@@ -111,9 +111,9 @@ if __name__ == '__main__':
     filename = "answer.txt"
     matrix = read_input(filename)
     s = puzzleSolver(matrix)
-    path = s.eight_puzzle_solver(0)
+    path = s.solver(0)
     # print(path)
     print(len(path))
-    path = s.eight_puzzle_solver(1)
+    path = s.solver(1)
     # print(path)
     print(len(path))
