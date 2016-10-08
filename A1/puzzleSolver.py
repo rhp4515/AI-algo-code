@@ -15,34 +15,22 @@ class puzzleSolver(object):
 
     def get_valid_moves(self, matrix):
         result = []
-
-        def find_gap(board):
-            for i in range(self.m):
-                for j in range(self.n):
-                    if board[i][j] == 0:
-                        return i, j
-            return -1, -1
-
-        def is_valid_pos(x, y):
-            return (x >= 0) and (x < self.m) and (y >= 0) and (y < self.n)
-
-        def move_gap(board, action):
-            x, y = find_gap(board)
-            x2, y2 = x + self.moves[action][0], y + self.moves[action][1]
-
-            new_board = None
-
-            if is_valid_pos(x2, y2):
-                new_board = [row[:] for row in board]
-
-                tmp = new_board[x][y]
-                new_board[x][y] = new_board[x2][y2]
-                new_board[x2][y2] = tmp
-
-            return new_board
+        x, y = -1, -1
+        x, y = [[i, j] for i in range(self.m)
+                        for j in range(self.n) if matrix[i][j] == 0][0]
 
         for action in self.actions:
-            next_move = move_gap(matrix, action)
+            x2, y2 = x + self.moves[action][0], y + self.moves[action][1]
+
+            next_move = None
+
+            if (x2 >= 0) and (x2 < self.m) and (y2 >= 0) and (y2 < self.n):
+                next_move = [row[:] for row in matrix]
+
+                tmp = next_move[x][y]
+                next_move[x][y] = next_move[x2][y2]
+                next_move[x2][y2] = tmp
+
             if next_move is not None:
                 result.append([next_move, action])
 
