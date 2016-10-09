@@ -40,6 +40,7 @@ class puzzleSolver(object):
                                 [4, 5, 6],
                                 [7, 8, 0]
                               ]
+        self.explored_nodes = []
 
     # Get valid moves function finds the gap in the input matrix, check if the particular position it is trying to move
     # on is valid and attempts to move the gap in the specific row and column number specified.
@@ -158,10 +159,15 @@ class puzzleSolver(object):
 
     def _rbfs_solver(self, parent, h_fn, limit):
         print(parent['h'], parent['state'])
-        if parent['h'] == 0:
-            return [parent['path']], parent['h']
+        if parent['state'] == self.goal_state:
+            return [parent['path']], 0
+
+        if parent['state'] not in self.explored_nodes:
+            self.explored_nodes.append(parent['state'])
 
         moves = self.get_valid_moves(parent['state'])
+
+        moves = [x for x in moves if x[0] not in self.explored_nodes]
 
         if len(moves) == 0:
             return None, float('inf')
@@ -170,7 +176,8 @@ class puzzleSolver(object):
 
         for move in moves:
             h, state = h_fn(move[0])
-            hnode = dict(state=state, h=h, path=move[1])
+            print(h)
+            hnode = dict(state=state, h=min(parent['h'], h+1), path=move[1])
             children_nodes.append(hnode)
 
         while True:
@@ -178,8 +185,8 @@ class puzzleSolver(object):
 
             best_child = children_nodes[0]
 
-            if best_child['h'] >= limit:
-                return None, float('inf')
+            if best_child['h'] > limit:
+                return None, limit
 
             next_best_h = children_nodes[1]['h'] if len(children_nodes) > 1 else float('inf')
 
@@ -200,7 +207,7 @@ class puzzleSolver(object):
             h_fn = self.heuristics_manhattan_distance
 
         h, _ = h_fn(start)
-        hnode = dict(state=start, f=0+h, h=h, path='')
+        hnode = dict(state=start, h=h, path='')
 
         return self._rbfs_solver(hnode, h_fn, float('inf'))
 
