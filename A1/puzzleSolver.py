@@ -172,12 +172,50 @@ def file_write(target,path,total_time,heuristic):
     target.write('\n')
 
 if __name__ == '__main__':
-    filename = "answer.txt"
+    algo = 1
+    n = 3
+    in_file = ''
+    out_file = ''
+
+    if len(sys.argv) == 5:
+        algo = int(sys.argv[1])
+        n = int(sys.argv[2])
+        in_file = sys.argv[3]
+        out_file = sys.argv[4]
+    else:
+        print('Wrong number of arguments. Usage:\npuzzleSolver.py <Algo(1/2) - Algo to use : 1-A* 2-Memory Bounded> <N - puzzle-format : 3= 8-puzzle 4=15-puzzle> <INPATH - input file path> <OUTPATH - output file path>\npuzzleGenerator.py <N> <OUTPATH>')
+
+    if algo != 1 and algo != 2:
+        print ("the value of Algo must be either 1/2. 1 for A* and 2 for Memory Bound Search(RBFS)")
+
+
+    if n != 3 and n != 4:
+        print ("the value of n must be either 3/4. 3 for 8-puzzle and 4 for 15-puzzle")
+
+
+    if in_file == '':
+        print ("the infile cannot be empty")
+
+
+    if out_file == '':
+        print ("the infile cannot be empty")
+
+    filename = in_file
     matrix = read_input(filename)
     s = puzzleSolver(matrix)
-    path = s.solver(0)
-    # print(path)
-    print(len(path))
+    target = open(out_file, 'w+')
+
+    start_time = datetime.datetime.now()
     path = s.solver(1)
-    # print(path)
-    print(len(path))
+    end_time = datetime.datetime.now()
+    total_time = (end_time - start_time).microseconds
+
+
+    file_write(target,path,total_time,1)
+
+    start_time = datetime.datetime.now()
+    path = s.solver(0)
+    end_time = datetime.datetime.now()
+    total_time = (end_time - start_time).microseconds
+
+    file_write(target,path,total_time,0)
