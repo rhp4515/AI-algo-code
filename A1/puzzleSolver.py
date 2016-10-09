@@ -176,7 +176,7 @@ def write(f_name, path, depth, total_time, heuristic):
         f.write('{0}\n{1}\n{2}\n{3}\n{4}\n\n'.format(title, dirs, num_exp,
                                                    sol_depth, time_taken))
 
-if __name__ == '__main__':
+def main():
     algo = A_STAR
     n = 3
     in_file = None
@@ -188,26 +188,32 @@ if __name__ == '__main__':
         in_file = sys.argv[3]
         out_file = sys.argv[4]
     else:
-        print('Wrong number of arguments.')
-        print('Usage:')
-        print('puzzleSolver.py <Algo(1/2) - '\
-              'Algo to use: 1-A* 2-Memory Bounded> '\
-              '<N - puzzle-format : 3= 8-puzzle 4=15-puzzle> '\
-              '<INPATH - input file path> '\
-              '<OUTPATH - output file path>')
-        print('puzzleGenerator.py <N> <OUTPATH>')
+        print('Usage: puzzleSolver.py')
+        print('\t<Algo(1/2) - Algo to use: 1-A* 2-Memory Bounded>')
+        print('\t<N - puzzle-format : 3= 8-puzzle 4=15-puzzle>')
+        print('\t<INPATH - input file path>')
+        print('\t<OUTPATH - output file path>')
+        print('Usage: puzzleGenerator.py')
+        print('\t<N> <OUTPATH>')
+        return
 
     if algo != A_STAR and algo != RBFS:
-        print ("the value of Algo must be either 1/2. 1 for A* and 2 for Memory Bound Search(RBFS)")
+        print('the value of Algo must be either 1/2.')
+        print('1 for A* and 2 for Memory Bound Search(RBFS)')
+        return
 
     if n != 3 and n != 4:
-        print ("the value of n must be either 3/4. 3 for 8-puzzle and 4 for 15-puzzle")
+        print ("the value of n must be either 3/4.")
+        print("3 for 8-puzzle and 4 for 15-puzzle")
+        return
 
-    if in_file is None:
+    if in_file is None or in_file == '':
         print ("the infile cannot be empty")
+        return
 
-    if out_file is None:
+    if out_file is None or out_file == '':
         print ("the outfile cannot be empty")
+        return
 
     matrix = read_input(in_file)
 
@@ -227,3 +233,6 @@ if __name__ == '__main__':
     elif algo == RBFS:
         print('RBFS coming sooon!!!')
 
+
+if __name__ == '__main__':
+    main()
