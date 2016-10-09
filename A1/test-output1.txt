@@ -1,5 +1,5 @@
 Heuristic 2: Hamming Distance/No of misplaced tiles
-Directions: []
+Directions: 4
 
 The Solution Depth: 0
 Time Taken: 3000 microseconds, 3 milliseconds
