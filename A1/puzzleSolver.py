@@ -103,8 +103,10 @@ class puzzleSolver(object):
             path.append(current[1])
         return path[::-1]
 
+    # this algorithm has been refered from the link : https://en.wikipedia.org/wiki/A*_search_algorithm
+
     # the crux of the problem solving algorithm
-    # the function that returns the possible actions to start performing on the
+    # the function that returns the possible actions using the A* algorithm to start performing on the
     # start state to reach the goal state
     def a_star_solver(self, method):
         # a list to keep track of the list of explored nodes
@@ -171,88 +173,53 @@ class puzzleSolver(object):
         # return the list of moves
         return final_path, -1
 
-    def _rbfs_solver(self, parent, h_fn, limit):
-        print('parent', parent['h'], parent['state'])
-        if parent['state'] == self.goal_state:
-            return [parent['path']], 0
-
-        # if parent['state'] not in self.explored_nodes:
-        #     self.explored_nodes.append(parent['state'])
-
-        moves = self.get_valid_moves(parent['state'])
-
-        moves = [x for x in moves]
-
-        if len(moves) == 0:
-            return None, float('inf')
-
-        children_nodes = []
-
-        for move in moves:
-            h, state = h_fn(move[0])
-            print(h, state, parent['state'])
-            hnode = dict(state=state, h=h+1, path=move[1])
-            children_nodes.append(hnode)
-
-        while True:
-            children_nodes.sort(key=lambda k: k['h'])
-
-            best_child = children_nodes[0]
-            print('best_child', best_child)
-
-            if best_child['h'] > limit:
-                return None, limit
-
-            if len(children_nodes) > 1:
-                next_best_h = children_nodes[1]['h']
-            else:
-                return float('inf')
-
-            result, best_child['h'] = self._rbfs_solver(best_child, h_fn, min(limit, next_best_h))
-
-            if result is not None:
-                if parent['path'] != '':
-                    result.insert(0, parent['path'])
-                return result, best_child['h']
 
 
-    def rbfs_solver(self, method):
-        start = self.input_matrix
-
-        if method == HAMMING_DIST:
-            h_fn = self.heuristics_misplaced_tiles
-        elif method == MANHATTAN_DIST:
-            h_fn = self.heuristics_manhattan_distance
-
-        h, _ = h_fn(start)
-        hnode = dict(state=start, h=h, path='')
-
-        return self._rbfs_solver(hnode, h_fn, float('inf'))
-
+    # https://en.wikipedia.org/wiki/Iterative_deepening_A*
+    # the helper function for the Iterative Deeping A* algorithm to compute the path from the start state to the goal state
     def _search(self, node, g, bound, h_fn, path, explored_nodes):
+        # the heuristic value of the start state
         h_value, _ = h_fn(node)
+
+        # the f-value for the start state
         f = g + h_value
 
+        #if the f value is greater than the bound then return that value
         if f > bound:
             return f
 
+        # if the node is equal to the goal state , then return that the goal state is found by the algorithm
         if node == self.goal_state:
             return -1
 
+        # initialize the minimum value to infinity, to find the minimum value later
         minimum = float('inf')
 
+        # compute the moves possible from the current state
         for move in self.get_valid_moves(node):
+            # append the candidate state in the temporary path
             path.append(move[1])
+
+            # increment the explored nodes count by 1
             explored_nodes[0] += 1
+            #recursively call the function on the next state by incrementing the g value by 1
             t = self._search(move[0], g+1, bound, h_fn, path, explored_nodes)
+            # if the goal state is found, then return found to the main function(or to the next thing in the recursion stack)
+
             if t == -1:
                 # print('g value =', g)
                 return -1
             else:
+                # if not in the optimal path , then remove the candidate from the path
                 path.pop()
+            # find the minimum bound for the next iteration
             minimum = min(t, minimum)
+        # return the minimum bound to the calling function
         return minimum
 
+
+    # the function that returns the possible actions to perform using the IDA* algorithm to start performing on the
+    # start state to reach the goal state
     def ida_star_solver(self, method):
         # logic to select which heuristic function to select to implement A* algorithm
         if method == HAMMING_DIST:
@@ -260,16 +227,23 @@ class puzzleSolver(object):
         elif method == MANHATTAN_DIST:
             h_fn = self.heuristics_manhattan_distance
 
+        # the path to compute the ida* algorithm
         path = []
+        #compute the initial bound and the start state
         bound, start = h_fn(self.input_matrix)
 
+
         explored_nodes = [1]
+
         while True:
             t = self._search(start, 0, bound, h_fn, path, explored_nodes)
+            # if the final state is found, then return the path and the number of explored nodes to the calling function
             if t == -1:
                 return path, explored_nodes
+            # if the final state is not found, if the given limit of bounds, then return not found to the calling function
             elif t == float('inf'):
                 return path, explored_nodes
+            #set the new bound to be the new value of t received from the search function
             bound = t
 
 
@@ -304,7 +278,9 @@ def write(f_name, path, num_explored, total_time, heuristic):
         f.write('{0}\n{1}\n{2}\n{3}\n{4}\n\n'.format(title, dirs, num_exp,
                                                    sol_depth, time_taken))
 
+# the main function to compute the paths using the A* and the IDA* algorithms
 def main():
+    # parsing of the command line arguments
     algo = IDA
     n = 3
     in_file = None
@@ -349,24 +325,38 @@ def main():
     with open(out_file, 'w') as f:
             pass
 
+    #take the path corresponding the required algorithm
     if algo == A_STAR:
+        #create an instance of the puzzleSolver class
         s = puzzleSolver(matrix)
 
+        # compute the paths using both the possible heuristic
         for h in [MANHATTAN_DIST, HAMMING_DIST]:
+            # get the current value of system time
             start_time = datetime.now()
+            #call the function to compute the path using A*
             path, num_explored = s.a_star_solver(h)
+            # get the current value of system time
             end_time = datetime.now()
+            #take the difference to get the time taken by the function to calculate the path in microseconds
             total_time = (end_time - start_time).microseconds
+            # write the details in the output file
             write(out_file, path, num_explored, total_time, h)
 
     elif algo == IDA:
+        #create an instance of the puzzleSolver class
         s = puzzleSolver(matrix)
 
         for h in [MANHATTAN_DIST, HAMMING_DIST]:
+            # get the current value of system time
             start_time = datetime.now()
+            #call the function to compute the path using IDA*
             path, num_explored = s.ida_star_solver(h)
+            # get the current value of the system time
             end_time = datetime.now()
+            #take the difference to get the time taken by the function to calculate the path in microseconds
             total_time = (end_time - start_time).microseconds
+            # write the details in the output file
             write(out_file, path, num_explored[0], total_time, h)
 
 
