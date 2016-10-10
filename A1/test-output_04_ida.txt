@@ -1,0 +1,12 @@
+Heuristic 1: Manhattan Distance
+Directions: ['R', 'R', 'R', 'D', 'D', 'L', 'L', 'U', 'L', 'U', 'R', 'D', 'R', 'D', 'R', 'D']
+Number of explored nodes: 218
+The Solution Depth: 16
+Time Taken: 8000 microseconds, 8 milliseconds
+
+Heuristic 2: Hamming Distance/No of misplaced tiles
+Directions: ['R', 'R', 'R', 'D', 'D', 'L', 'L', 'U', 'L', 'U', 'R', 'D', 'R', 'D', 'R', 'D']
+Number of explored nodes: 6925
+The Solution Depth: 16
+Time Taken: 66000 microseconds, 66 milliseconds
+
